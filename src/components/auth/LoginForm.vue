@@ -6,9 +6,7 @@
             </div>
 
             <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">
-                    Email
-                </label>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input
                     id="email"
                     v-model="formData.email"
@@ -20,9 +18,7 @@
             </div>
 
             <div>
-                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">
-                    Password
-                </label>
+                <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
                 <input
                     id="password"
                     v-model="formData.password"
@@ -35,16 +31,11 @@
 
             <div class="flex items-center justify-between">
                 <label class="flex items-center">
-                    <input
-                        type="checkbox"
-                        class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
+                    <input type="checkbox" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
                     <span class="ml-2 text-sm text-gray-600">Remember me</span>
                 </label>
 
-                <a href="#" class="text-sm text-blue-600 hover:text-blue-700">
-                    Forgot password?
-                </a>
+                <a href="#" class="text-sm text-blue-600 hover:text-blue-700">Forgot password?</a>
             </div>
 
             <button
@@ -58,39 +49,37 @@
 
             <div class="text-center text-sm text-gray-600">
                 Don't have an account?
-                <router-link to="/register" class="text-blue-600 hover:text-blue-700 font-medium">
-                    Sign up
-                </router-link>
+                <router-link to="/register" class="text-blue-600 hover:text-blue-700 font-medium">Sign up</router-link>
             </div>
         </form>
     </Card>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { useAuth } from '@/composables/useAuth'
-import Card from '@/components/shared/Card.vue'
-import LoadingSpinner from '@/components/shared/LoadingSpinner.vue'
-import type { LoginCredentials } from '@/types/auth.types'
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { useAuth } from '@/composables/useAuth';
+import Card from '@/components/shared/Card.vue';
+import LoadingSpinner from '@/components/shared/LoadingSpinner.vue';
+import type { LoginCredentials } from '@/types/auth.types';
 
-const router = useRouter()
-const { login, loading } = useAuth()
+const router = useRouter();
+const { login, loading } = useAuth();
 
 const formData = ref<LoginCredentials>({
     email: '',
     password: '',
-})
+});
 
-const error = ref<string | null>(null)
+const error = ref<string | null>(null);
 
 async function handleSubmit() {
     try {
-        error.value = null
-        await login(formData.value)
-        router.push('/dashboard')
+        error.value = null;
+        await login(formData.value);
+        router.push('/dashboard');
     } catch (err: any) {
-        error.value = err.message || 'Invalid email or password'
+        error.value = err.message || 'Invalid email or password';
     }
 }
 </script>

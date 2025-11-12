@@ -1,29 +1,21 @@
-import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router'
+import type { NavigationGuardNext, RouteLocationNormalized } from 'vue-router';
 
-export function authGuard(
-    to: RouteLocationNormalized,
-    from: RouteLocationNormalized,
-    next: NavigationGuardNext
-) {
-    const token = localStorage.getItem('access_token')
+export function authGuard(to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) {
+    const token = localStorage.getItem('access_token');
 
     if (!token) {
-        next({ name: 'login', query: { redirect: to.fullPath } })
+        next({ name: 'login', query: { redirect: to.fullPath } });
     } else {
-        next()
+        next();
     }
 }
 
-export function guestGuard(
-    to: RouteLocationNormalized,
-    from: RouteLocationNormalized,
-    next: NavigationGuardNext
-) {
-    const token = localStorage.getItem('access_token')
+export function guestGuard(to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) {
+    const token = localStorage.getItem('access_token');
 
     if (token) {
-        next({ name: 'dashboard' })
+        next({ name: 'dashboard' });
     } else {
-        next()
+        next();
     }
 }

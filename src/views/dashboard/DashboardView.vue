@@ -5,14 +5,9 @@
                 <h1 class="text-3xl font-bold text-gray-900 mb-6">Dashboard</h1>
 
                 <Card title="Welcome to MKPay">
-                    <p class="text-gray-600">
-                        You are successfully logged in!
-                    </p>
+                    <p class="text-gray-600">You are successfully logged in!</p>
                     <div class="mt-4">
-                        <button
-                            @click="handleLogout"
-                            class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
-                        >
+                        <button @click="handleLogout" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
                             Logout
                         </button>
                     </div>
@@ -23,15 +18,15 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
-import { useAuth } from '@/composables/useAuth'
-import Card from '@/components/shared/Card.vue'
+import { useRouter } from 'vue-router';
+import { useAuth } from '@/composables/useAuth';
+import Card from '@/components/shared/Card.vue';
 
-const router = useRouter()
-const { logout } = useAuth()
+const router = useRouter();
+const { logout } = useAuth();
 
 async function handleLogout() {
-    await logout()
-    router.push('/login')
+    await logout();
+    router.push('/login');
 }
 </script>

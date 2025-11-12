@@ -1,15 +1,15 @@
-import { useAuthStore } from '@/stores/auth.store'
-import { storeToRefs } from 'pinia'
+import { useAuthStore } from '@/stores/auth.store';
+import { storeToRefs } from 'pinia';
 
 export function useAuth() {
-    const authStore = useAuthStore()
-    const { user, isAuthenticated, loading, error } = storeToRefs(authStore)
+    const authStore = useAuthStore();
+    const { user, isAuthenticated, loading, error } = storeToRefs(authStore);
 
-    const login = authStore.login
-    const register = authStore.register
-    const logout = authStore.logout
-    const loadUser = authStore.loadUser
-    const refresh = authStore.refresh
+    const login = authStore.login;
+    const register = authStore.register;
+    const logout = authStore.logout;
+    const loadUser = authStore.loadUser;
+    const refresh = authStore.refresh;
 
     return {
         // State
@@ -23,5 +23,5 @@ export function useAuth() {
         logout,
         loadUser,
         refresh,
-    }
+    };
 }

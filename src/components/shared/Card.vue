@@ -18,30 +18,30 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
 interface Props {
-    title?: string
-    subtitle?: string
-    padding?: 'none' | 'sm' | 'md' | 'lg'
+    title?: string;
+    subtitle?: string;
+    padding?: 'none' | 'sm' | 'md' | 'lg';
 }
 
 const props = withDefaults(defineProps<Props>(), {
     padding: 'md',
-})
+});
 
 const paddingClass = computed(() => {
     switch (props.padding) {
         case 'none':
-            return 'p-0'
+            return 'p-0';
         case 'sm':
-            return 'p-3'
+            return 'p-3';
         case 'md':
-            return 'p-6'
+            return 'p-6';
         case 'lg':
-            return 'p-8'
+            return 'p-8';
         default:
-            return 'p-6'
+            return 'p-6';
     }
-})
+});
 </script>
