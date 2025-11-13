@@ -48,12 +48,15 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
 import AccountSelector from '@/components/shared/AccountSelector.vue';
 import { useAccountsStore } from '@/stores/accounts.store';
 
+const router = useRouter();
 const accountsStore = useAccountsStore();
 const selectedUuid = ref<string | null>(accountsStore.currentAccountUuid || '');
+let isInitialMount = true;
 
 onMounted(async () => {
     // Carregar contas se não estiverem carregadas
@@ -68,5 +71,17 @@ onMounted(async () => {
     }
 
     selectedUuid.value = selectedUuid.value || '';
+    isInitialMount = false;
 });
+
+// Redirecionar para / ao mudar de conta
+watch(
+    () => accountsStore.currentAccount,
+    (newAccount) => {
+        // Pula o redirect na primeira carga
+        if (!isInitialMount && newAccount) {
+            router.push('/');
+        }
+    }
+);
 </script>
