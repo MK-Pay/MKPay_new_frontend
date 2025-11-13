@@ -1,7 +1,16 @@
+import {
+    computed,
+    ref,
+} from 'vue';
+
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+
 import authService from '@/services/auth.service';
-import type { User, LoginCredentials, RegisterData } from '@/types/auth.types';
+import type {
+    LoginCredentials,
+    RegisterData,
+    User,
+} from '@/types/auth.types';
 
 export const useAuthStore = defineStore('auth', () => {
     // State
@@ -22,13 +31,14 @@ export const useAuthStore = defineStore('auth', () => {
             error.value = null;
 
             const response = await authService.login(credentials);
+            accessToken.value = response?.token;
+            refreshToken.value = response?.refresh_token;
 
-            user.value = response.user;
-            accessToken.value = response.tokens.access_token;
-            refreshToken.value = response.tokens.refresh_token;
+            localStorage.setItem('access_token', response?.token || null);
+            localStorage.setItem('refresh_token', response?.refresh_token || null);
 
-            localStorage.setItem('access_token', response.tokens.access_token);
-            localStorage.setItem('refresh_token', response.tokens.refresh_token);
+            const userData = await authService.me();
+            user.value = userData;
 
             return response;
         } catch (err: any) {
@@ -46,12 +56,14 @@ export const useAuthStore = defineStore('auth', () => {
 
             const response = await authService.register(data);
 
-            user.value = response.user;
-            accessToken.value = response.tokens.access_token;
-            refreshToken.value = response.tokens.refresh_token;
+            accessToken.value = response?.token;
+            refreshToken.value = response?.refresh_token;
 
-            localStorage.setItem('access_token', response.tokens.access_token);
-            localStorage.setItem('refresh_token', response.tokens.refresh_token);
+            localStorage.setItem('access_token', response?.token);
+            localStorage.setItem('refresh_token', response?.refresh_token);
+
+            const userData = await authService.me();
+            user.value = userData;
 
             return response;
         } catch (err: any) {
@@ -104,12 +116,14 @@ export const useAuthStore = defineStore('auth', () => {
         try {
             const response = await authService.refreshToken(refreshToken.value);
 
-            user.value = response.user;
-            accessToken.value = response.tokens.access_token;
-            refreshToken.value = response.tokens.refresh_token;
+            accessToken.value = response?.token;
+            refreshToken.value = response?.refresh_token;
 
-            localStorage.setItem('access_token', response.tokens.access_token);
-            localStorage.setItem('refresh_token', response.tokens.refresh_token);
+            localStorage.setItem('access_token', response?.token);
+            localStorage.setItem('refresh_token', response?.refresh_token);
+
+            const userData = await authService.me();
+            user.value = userData;
 
             return response;
         } catch (err) {

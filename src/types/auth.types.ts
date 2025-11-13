@@ -1,3 +1,13 @@
+export interface Account {
+    id: string;
+    uuid: string;
+    name: string;
+    document?: string;
+    status: 'active' | 'inactive' | 'suspended';
+    created_at: string;
+    updated_at: string;
+}
+
 export interface User {
     id: string;
     name: string;
@@ -5,6 +15,7 @@ export interface User {
     company_name?: string;
     document?: string;
     status: 'active' | 'pending' | 'suspended';
+    accounts?: Account[];
     created_at: string;
     updated_at: string;
 }
@@ -21,6 +32,11 @@ export interface RegisterData {
     password_confirmation: string;
     company_name?: string;
     document?: string;
+}
+
+export interface PlainToken {
+    token: string;
+    refresh_token?: string;
 }
 
 export interface AuthTokens {

@@ -1,39 +1,68 @@
-import api from './api';
-import type {
-    LoginCredentials,
-    RegisterData,
-    AuthResponse,
-    User,
-    ForgotPasswordData,
-    ResetPasswordData,
-} from '@/types/auth.types';
 import type { ApiResponse } from '@/types/api.types';
+import type {
+    AuthResponse,
+    AuthTokens,
+    ForgotPasswordData,
+    LoginCredentials,
+    PlainToken,
+    RegisterData,
+    ResetPasswordData,
+    User,
+} from '@/types/auth.types';
+
+import api from './api';
 
 class AuthService {
-    async login(credentials: LoginCredentials): Promise<AuthResponse> {
-        const response = await api.post<ApiResponse<AuthResponse>>('/api/v1/auth/login', credentials);
-        return response.data.data;
+    async login(credentials: LoginCredentials): Promise<PlainToken|AuthTokens> {
+        const response = await api.post<ApiResponse<PlainToken|AuthTokens>>('/api/v1/auth/login', credentials);
+
+        if ('data' in response) {
+            return 'data' in response?.data ? response?.data?.data : response?.data;
+        }
+
+        return response;
     }
 
-    async register(data: RegisterData): Promise<AuthResponse> {
-        const response = await api.post<ApiResponse<AuthResponse>>('/api/v1/auth/register', data);
-        return response.data.data;
+    async register(data: RegisterData): Promise<PlainToken|AuthTokens> {
+        const response = await api.post<ApiResponse<PlainToken|AuthTokens>>('/api/v1/auth/register', data);
+
+        if ('data' in response) {
+            return 'data' in response?.data ? response?.data?.data : response?.data;
+        }
+
+        return response;
     }
 
     async logout(): Promise<void> {
         await api.post('/api/v1/auth/logout');
     }
 
-    async refreshToken(refreshToken: string): Promise<AuthResponse> {
-        const response = await api.post<ApiResponse<AuthResponse>>('/api/v1/auth/refresh', {
+    async refreshToken(refreshToken: string): Promise<AuthResponse|AuthTokens|PlainToken> {
+        const response = await api.post<ApiResponse<AuthResponse|AuthTokens|PlainToken>>('/api/v1/auth/refresh', {
             refresh_token: refreshToken,
         });
-        return response.data.data;
+
+        if ('data' in response) {
+            return 'data' in response?.data ? response?.data?.data : response?.data;
+        }
+
+        return response;
     }
 
-    async me(): Promise<User> {
+    async me(): Promise<User|null> {
+        const token = localStorage.getItem('access_token');
+
+        if (typeof token !== 'string' || !token.trim()) {
+            return null;
+        }
+
         const response = await api.get<ApiResponse<User>>('/api/v1/auth/me');
-        return response.data.data;
+
+        if ('data' in response) {
+            return 'data' in response?.data ? response?.data?.data : response?.data;
+        }
+
+        return response;
     }
 
     async forgotPassword(data: ForgotPasswordData): Promise<void> {

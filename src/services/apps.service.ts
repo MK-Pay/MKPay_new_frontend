@@ -1,11 +1,24 @@
 import api from './api';
+import { useAccountsStore } from '@/stores/accounts.store';
 import type { App, AppStats, CreateAppDTO, UpdateAppDTO } from '@/types/app.types';
-import type { ApiResponse } from '@/types/api.types';
+import type { ApiResponse, PaginatedResponse } from '@/types/api.types';
 
 class AppsService {
+    private getAccountUuid(): string {
+        const accountsStore = useAccountsStore();
+        const uuid = accountsStore.currentAccountUuid;
+        if (!uuid) {
+            throw new Error('No account selected');
+        }
+        return uuid;
+    }
+
     async getApps(): Promise<App[]> {
-        const response = await api.get<ApiResponse<App[]>>('/api/v1/apps');
-        return response.data.data;
+        const accountUuid = this.getAccountUuid();
+        const response = await api.get<ApiResponse<PaginatedResponse<App>>>('/api/v1/apps', {
+            params: { account_uuid: accountUuid },
+        });
+        return response.data.data.data;
     }
 
     async getApp(id: string): Promise<App> {
@@ -14,7 +27,11 @@ class AppsService {
     }
 
     async createApp(data: CreateAppDTO): Promise<App> {
-        const response = await api.post<ApiResponse<App>>('/api/v1/apps', data);
+        const accountUuid = this.getAccountUuid();
+        const response = await api.post<ApiResponse<App>>('/api/v1/apps', {
+            ...data,
+            account_uuid: accountUuid,
+        });
         return response.data.data;
     }
 
