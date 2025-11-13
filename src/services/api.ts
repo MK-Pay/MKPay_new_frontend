@@ -1,84 +1,168 @@
-import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import type { ApiError, ApiResponse } from '@/types/api.types';
 
-const api: AxiosInstance = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
-    timeout: 30000,
-    headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-    },
-});
+interface RequestConfig extends RequestInit {
+    params?: Record<string, any>;
+}
 
-// Request interceptor
-api.interceptors.request.use(
-    (config: InternalAxiosRequestConfig) => {
-        // Get token from localStorage
+class ApiClient {
+    private baseURL: string;
+    private defaultHeaders: HeadersInit;
+
+    constructor() {
+        this.baseURL = import.meta.env.VITE_API_BASE_URL;
+        this.defaultHeaders = {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+        };
+    }
+
+    private getHeaders(): HeadersInit {
+        const headers: HeadersInit = { ...this.defaultHeaders };
         const token = localStorage.getItem('access_token');
 
-        if (token && config.headers) {
-            config.headers.Authorization = `Bearer ${token}`;
+        if (token) {
+            headers.Authorization = `Bearer ${token}`;
         }
 
-        return config;
-    },
-    (error: AxiosError) => {
-        return Promise.reject(error);
+        return headers;
     }
-);
 
-// Response interceptor
-api.interceptors.response.use(
-    (response: AxiosResponse<ApiResponse>) => {
-        return response;
-    },
-    async (error: AxiosError<ApiError>) => {
-        const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
+    private buildURL(endpoint: string, params?: Record<string, any>): string {
+        const url = new URL(endpoint, this.baseURL);
 
-        // Handle 401 Unauthorized
-        if (error.response?.status === 401 && !originalRequest._retry) {
-            originalRequest._retry = true;
+        if (params) {
+            Object.keys(params).forEach((key) => {
+                if (params[key] !== undefined && params[key] !== null) {
+                    url.searchParams.append(key, String(params[key]));
+                }
+            });
+        }
 
-            try {
-                // Try to refresh token
+        return url.toString();
+    }
+
+    private async handleResponse<T>(response: Response): Promise<ApiResponse<T>> {
+        if (!response.ok) {
+            // Handle 401 Unauthorized
+            if (response.status === 401) {
                 const refreshToken = localStorage.getItem('refresh_token');
 
                 if (refreshToken) {
-                    const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/refresh`, {
-                        refresh_token: refreshToken,
-                    });
+                    try {
+                        const refreshResponse = await fetch(`${this.baseURL}/api/v1/auth/refresh`, {
+                            method: 'POST',
+                            headers: this.defaultHeaders,
+                            body: JSON.stringify({ refresh_token: refreshToken }),
+                        });
 
-                    const { access_token, refresh_token } = response.data.data;
+                        if (refreshResponse.ok) {
+                            const data = await refreshResponse.json();
+                            const { access_token, refresh_token: newRefreshToken } = data.data;
 
-                    // Update tokens
-                    localStorage.setItem('access_token', access_token);
-                    localStorage.setItem('refresh_token', refresh_token);
+                            localStorage.setItem('access_token', access_token);
+                            localStorage.setItem('refresh_token', newRefreshToken);
 
-                    // Retry original request
-                    if (originalRequest.headers) {
-                        originalRequest.headers.Authorization = `Bearer ${access_token}`;
+                            // Retry original request with new token
+                            const retryHeaders = { ...this.getHeaders() };
+                            const retryResponse = await fetch(response.url, {
+                                method: response.type,
+                                headers: retryHeaders,
+                            });
+
+                            if (retryResponse.ok) {
+                                return await retryResponse.json();
+                            }
+                        }
+                    } catch (error) {
+                        // Refresh failed, clear tokens and redirect
+                        localStorage.removeItem('access_token');
+                        localStorage.removeItem('refresh_token');
+                        window.location.href = '/login';
                     }
-
-                    return api(originalRequest);
                 }
-            } catch (refreshError) {
-                // Refresh failed, clear tokens and redirect to login
+
+                // No refresh token or refresh failed
                 localStorage.removeItem('access_token');
                 localStorage.removeItem('refresh_token');
                 window.location.href = '/login';
-                return Promise.reject(refreshError);
             }
+
+            // Handle other errors
+            const errorData = await response.json().catch(() => ({
+                message: 'An unexpected error occurred',
+            }));
+
+            const apiError: ApiError = {
+                message: errorData.message || 'An unexpected error occurred',
+                errors: errorData.errors,
+                statusCode: response.status,
+            };
+
+            throw apiError;
         }
 
-        // Handle other errors
-        const apiError: ApiError = {
-            message: error.response?.data?.message || 'An unexpected error occurred',
-            errors: error.response?.data?.errors,
-            statusCode: error.response?.status || 500,
-        };
-
-        return Promise.reject(apiError);
+        return await response.json();
     }
-);
+
+    async get<T>(endpoint: string, config?: RequestConfig): Promise<ApiResponse<T>> {
+        const url = this.buildURL(endpoint, config?.params);
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: this.getHeaders(),
+            ...config,
+        });
+
+        return this.handleResponse<T>(response);
+    }
+
+    async post<T>(endpoint: string, data?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
+        const url = this.buildURL(endpoint, config?.params);
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: this.getHeaders(),
+            body: data ? JSON.stringify(data) : undefined,
+            ...config,
+        });
+
+        return this.handleResponse<T>(response);
+    }
+
+    async put<T>(endpoint: string, data?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
+        const url = this.buildURL(endpoint, config?.params);
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: this.getHeaders(),
+            body: data ? JSON.stringify(data) : undefined,
+            ...config,
+        });
+
+        return this.handleResponse<T>(response);
+    }
+
+    async patch<T>(endpoint: string, data?: any, config?: RequestConfig): Promise<ApiResponse<T>> {
+        const url = this.buildURL(endpoint, config?.params);
+        const response = await fetch(url, {
+            method: 'PATCH',
+            headers: this.getHeaders(),
+            body: data ? JSON.stringify(data) : undefined,
+            ...config,
+        });
+
+        return this.handleResponse<T>(response);
+    }
+
+    async delete<T>(endpoint: string, config?: RequestConfig): Promise<ApiResponse<T>> {
+        const url = this.buildURL(endpoint, config?.params);
+        const response = await fetch(url, {
+            method: 'DELETE',
+            headers: this.getHeaders(),
+            ...config,
+        });
+
+        return this.handleResponse<T>(response);
+    }
+}
+
+const api = new ApiClient();
 
 export default api;

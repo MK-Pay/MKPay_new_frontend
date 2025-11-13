@@ -2,31 +2,66 @@
     <div class="min-h-screen bg-gray-100">
         <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
             <div class="px-4 py-6 sm:px-0">
-                <h1 class="text-3xl font-bold text-gray-900 mb-6">Dashboard</h1>
+                <!-- Header -->
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
+                    <p class="mt-1 text-sm text-gray-600">Bem-vindo de volta! Aqui está um resumo da sua conta.</p>
+                </div>
 
-                <Card title="Welcome to MKPay">
-                    <p class="text-gray-600">You are successfully logged in!</p>
-                    <div class="mt-4">
-                        <button @click="handleLogout" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
-                            Logout
-                        </button>
+                <!-- Loading State -->
+                <LoadingSpinner v-if="loading" fullScreen />
+
+                <!-- Content -->
+                <div v-else class="space-y-6">
+                    <!-- Stats Cards -->
+                    <DashboardStats :stats="stats" />
+
+                    <!-- Grid Layout -->
+                    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                        <!-- Recent Sales -->
+                        <RecentSales :sales="recentSales" />
+
+                        <!-- Quick Actions -->
+                        <QuickActions />
                     </div>
-                </Card>
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
-import { useAuth } from '@/composables/useAuth';
-import Card from '@/components/shared/Card.vue';
+import { ref, onMounted } from 'vue';
+import DashboardStats from '@/components/dashboard/DashboardStats.vue';
+import RecentSales from '@/components/dashboard/RecentSales.vue';
+import QuickActions from '@/components/dashboard/QuickActions.vue';
+import LoadingSpinner from '@/components/shared/LoadingSpinner.vue';
+import dashboardService from '@/services/dashboard.service';
+import type { DashboardStats as DashboardStatsType, RecentSale } from '@/types/dashboard.types';
 
-const router = useRouter();
-const { logout } = useAuth();
+const loading = ref(true);
+const stats = ref<DashboardStatsType>();
+const recentSales = ref<RecentSale[]>([]);
 
-async function handleLogout() {
-    await logout();
-    router.push('/login');
+async function loadDashboardData() {
+    try {
+        loading.value = true;
+
+        const [statsData, salesData] = await Promise.all([
+            dashboardService.getStats(),
+            dashboardService.getRecentSales(10),
+        ]);
+
+        stats.value = statsData;
+        recentSales.value = salesData;
+    } catch (error) {
+        console.error('Failed to load dashboard data:', error);
+    } finally {
+        loading.value = false;
+    }
 }
+
+onMounted(() => {
+    loadDashboardData();
+});
 </script>

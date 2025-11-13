@@ -1,6 +1,6 @@
 <template>
     <Card title="Login" subtitle="Enter your credentials to access your account">
-        <form @submit.prevent="handleSubmit" class="space-y-4">
+        <form @submit.prevent="handleSubmit" class="space-y-4 p-4">
             <div v-if="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
                 {{ error }}
             </div>
@@ -57,18 +57,20 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
+
 import { useRouter } from 'vue-router';
-import { useAuth } from '@/composables/useAuth';
+
 import Card from '@/components/shared/Card.vue';
 import LoadingSpinner from '@/components/shared/LoadingSpinner.vue';
+import { useAuth } from '@/composables/useAuth';
 import type { LoginCredentials } from '@/types/auth.types';
 
 const router = useRouter();
 const { login, loading } = useAuth();
 
 const formData = ref<LoginCredentials>({
-    email: '',
-    password: '',
+    email: 'admin@mail.com',
+    password: 'power@123',
 });
 
 const error = ref<string | null>(null);
