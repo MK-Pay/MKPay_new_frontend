@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 
 import { useRouter } from 'vue-router';
 
@@ -21,7 +21,6 @@ import { useAccountsStore } from '@/stores/accounts.store';
 
 const router = useRouter();
 const accountsStore = useAccountsStore();
-const isAuthenticatedPage = ref(false);
 
 const AUTHENTICATED_ROUTES = [
     'dashboard',
@@ -35,13 +34,15 @@ const AUTHENTICATED_ROUTES = [
     'documentos',
 ];
 
-onMounted(async () => {
-    // Check if current route is authenticated
+// Computed para detectar rota autenticada em tempo real
+const isAuthenticatedPage = computed(() => {
     const currentRouteName = router.currentRoute.value.name as string;
-    isAuthenticatedPage.value = AUTHENTICATED_ROUTES.includes(currentRouteName);
+    return AUTHENTICATED_ROUTES.includes(currentRouteName);
+});
 
+// Função para carregar contas
+async function loadAccounts() {
     if (isAuthenticatedPage.value) {
-        // Load accounts if not already loaded
         if (accountsStore.accounts.length === 0) {
             try {
                 await accountsStore.fetchAccounts();
@@ -49,9 +50,21 @@ onMounted(async () => {
                 console.error('Failed to load accounts:', error);
             }
         } else {
-            // Restore selected account from localStorage
             accountsStore.restoreSelectedAccount();
         }
     }
+}
+
+// Carregar contas ao montar
+onMounted(() => {
+    loadAccounts();
 });
+
+// Carregar contas ao mudar de rota
+watch(
+    () => router.currentRoute.value.name,
+    () => {
+        loadAccounts();
+    }
+);
 </script>
