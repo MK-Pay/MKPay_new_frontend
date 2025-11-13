@@ -47,7 +47,7 @@ export const useAccountsStore = defineStore('accounts', () => {
     function restoreSelectedAccount() {
         const savedUuid = localStorage.getItem('selected_account_uuid');
         if (savedUuid && accounts.value.length > 0) {
-            const account = accounts.value.find(acc => acc.uuid === savedUuid);
+            const account = accounts.value.find((acc) => acc.uuid === savedUuid);
             if (account) {
                 selectedAccount.value = account;
             } else {

@@ -1,28 +1,35 @@
 export interface Account {
-    id: string;
+    id: number;
     uuid: string;
     name: string;
-    document?: string;
-    status: 'active' | 'inactive' | 'suspended';
+    email: string;
+    phone: string | null;
+    address: string | null;
+    city: string | null;
+    state: string | null;
+    zip_code: string | null;
+    country: string | null;
+    account_type_id: number;
+    account_category_id: number;
+    account_status_id: number;
     created_at: string;
     updated_at: string;
 }
 
 export interface User {
-    id: string;
+    id: number;
     name: string;
     email: string;
-    company_name?: string;
-    document?: string;
-    status: 'active' | 'pending' | 'suspended';
-    accounts?: Account[];
+    email_verified_at: string | null;
     created_at: string;
     updated_at: string;
+    accounts?: Account[];
 }
 
 export interface LoginCredentials {
     email: string;
     password: string;
+    remember?: boolean;
 }
 
 export interface RegisterData {
@@ -30,25 +37,10 @@ export interface RegisterData {
     email: string;
     password: string;
     password_confirmation: string;
-    company_name?: string;
-    document?: string;
-}
-
-export interface PlainToken {
-    token: string;
-    refresh_token?: string;
-}
-
-export interface AuthTokens {
-    access_token: string;
-    refresh_token: string;
-    token_type: string;
-    expires_in: number;
 }
 
 export interface AuthResponse {
-    user: User;
-    tokens: AuthTokens;
+    token: string; // API retorna apenas o token
 }
 
 export interface ForgotPasswordData {
