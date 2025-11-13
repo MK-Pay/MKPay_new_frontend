@@ -1,6 +1,13 @@
 <template>
     <div>
-        <slot />
+        <template v-if="isAuthenticatedPage">
+            <MainLayout>
+                <router-view />
+            </MainLayout>
+        </template>
+        <template v-else>
+            <router-view />
+        </template>
     </div>
 </template>
 
@@ -9,12 +16,12 @@ import { onMounted, ref } from 'vue';
 
 import { useRouter } from 'vue-router';
 
+import MainLayout from '@/components/layout/MainLayout.vue';
 import { useAccountsStore } from '@/stores/accounts.store';
 
 const router = useRouter();
 const accountsStore = useAccountsStore();
-const selectedUuid = ref<string>(accountsStore.currentAccountUuid || '');
-const isAuthenticatedPage = ref(Boolean(selectedUuid.value));
+const isAuthenticatedPage = ref(false);
 
 const AUTHENTICATED_ROUTES = [
     'dashboard',
