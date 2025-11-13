@@ -1,7 +1,7 @@
 <template>
     <div>
         <!-- Account Selector (only for authenticated pages) -->
-        <AccountSelector />
+        <!-- <AccountSelector /> -->
 
         <!-- Main Content -->
         <div v-if="accountsStore.currentAccountUuid">
