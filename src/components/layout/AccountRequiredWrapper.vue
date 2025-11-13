@@ -2,7 +2,7 @@
     <div>
         <!-- Account Selector Header -->
         <div class="bg-white border-b border-gray-200 shadow-sm">
-            <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
+            <!-- <div class="max-w-7xl mx-auto px-4 py-3 sm:px-6 lg:px-8">
                 <div class="flex items-center gap-3">
                     <label for="account-select" class="text-sm font-medium text-gray-700">Conta:</label>
                     <select
@@ -19,6 +19,8 @@
                     </select>
                 </div>
             </div>
+            -->
+            <AccountSelector />
         </div>
 
         <!-- Content or Empty State -->
@@ -46,6 +48,8 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue';
+
+import AccountSelector from '@/components/shared/AccountSelector.vue';
 import { useAccountsStore } from '@/stores/accounts.store';
 
 const accountsStore = useAccountsStore();
@@ -64,14 +68,5 @@ onMounted(async () => {
     }
 
     selectedUuid.value = selectedUuid.value || '';
-});
-
-watch(selectedUuid, (newUuid) => {
-    if (newUuid) {
-        const account = accountsStore?.accounts?.find((acc) => acc.uuid === newUuid);
-        if (account) {
-            accountsStore.selectAccount(account);
-        }
-    }
 });
 </script>

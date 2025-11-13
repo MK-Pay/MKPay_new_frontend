@@ -1,12 +1,6 @@
 <template>
     <div>
-        <!-- Account Selector (only for authenticated pages) -->
-        <!-- <AccountSelector /> -->
-
-        <!-- Main Content -->
-        <div v-if="accountsStore.currentAccountUuid">
-            <slot />
-        </div>
+        <slot />
     </div>
 </template>
 
@@ -15,7 +9,6 @@ import { onMounted, ref } from 'vue';
 
 import { useRouter } from 'vue-router';
 
-import AccountSelector from '@/components/shared/AccountSelector.vue';
 import { useAccountsStore } from '@/stores/accounts.store';
 
 const router = useRouter();
