@@ -38,10 +38,28 @@
                 <a href="#" class="text-sm text-blue-600 hover:text-blue-700">Forgot password?</a>
             </div>
 
+            <div class="flex items-center justify-between w-full">
+                <ul class="flex flex-col items-center justify-between w-full gap-3 py-2">
+                    <li
+                        v-for="(demoUser, index) in demoUsers"
+                        :key="index"
+                        class="flex flex-row gap-4 items-center justify-between"
+                    >
+                        <button
+                            type="button"
+                            @click.stop.prevent="selectUser(demoUser)"
+                            class="text-left cursor-pointer border block w-full px-3 rounded-md hover:bg-gray-200"
+                        >
+                            {{ demoUser?.email }} | {{ demoUser?.password }}
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
             <button
                 type="submit"
                 :disabled="loading"
-                class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center cursor-pointer"
             >
                 <LoadingSpinner v-if="loading" size="sm" color="white" />
                 <span v-else>Sign in</span>
@@ -69,8 +87,8 @@ const router = useRouter();
 const { login, loading } = useAuth();
 
 const formData = ref<LoginCredentials>({
-    email: 'admin@mail.com',
-    password: 'power@123',
+    email: '',
+    password: '',
 });
 
 const error = ref<string | null>(null);
@@ -78,10 +96,31 @@ const error = ref<string | null>(null);
 async function handleSubmit() {
     try {
         error.value = null;
-        await login(formData.value);
+        const loginResponse = await login(formData.value);
+
+        console.log('loginResponse', loginResponse);
+
         router.push('/dashboard');
     } catch (err: any) {
         error.value = err.message || 'Invalid email or password';
     }
 }
+
+const demoUsers = [
+    {
+        email: 'admin@mail.com',
+        password: 'power@123',
+    },
+    {
+        email: 'customer1@mail.com',
+        password: 'power@123',
+    },
+];
+
+const selectUser = function (userData: any) {
+    formData.value = userData || {
+        email: '',
+        password: '',
+    };
+};
 </script>

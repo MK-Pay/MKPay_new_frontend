@@ -63,12 +63,26 @@ Services use the global account context to pass `account_uuid` to API endpoints:
 
 ```typescript
 // Example: apps.service.ts
-async getApps(): Promise<App[]> {
+import { ifObjectOr } from '@/utils/data-helpers';
+
+async getApps(): Promise<App[]|null> {
     const accountUuid = this.getAccountUuid(); // Throws if none selected
+
+    if (!accountUuid) {
+        return null;
+    }
+
     const response = await api.get<ApiResponse<PaginatedResponse<App>>>('/api/v1/apps', {
         params: { account_uuid: accountUuid },
     });
-    return response.data.data.data;
+
+    if ('data' in response) {
+        return 'data' in ifObjectOr(response.data)
+            ? ifObjectOr(ifObjectOr(response.data)?.data)
+            : ifObjectOr(response.data);
+    }
+
+    return ifObjectOr(response);
 }
 ```
 

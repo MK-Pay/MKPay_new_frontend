@@ -1,7 +1,28 @@
 export interface ApiResponse<T = any> {
-    success: boolean;
-    data: T;
+    success?: boolean;
+    data?: T;
+    token?: T;
     message?: string;
+}
+
+export type ObjLiteral = Record<string, unknown>;
+
+export type StringMap = Record<string, string>;
+
+export type PrimitiveMap = Record<string, string | number | boolean>;
+
+export type MutableStringObject = {
+    [key: string]: string;
+};
+
+export type MutableMixedObject = {
+    // [key: string]: undefined;
+    // [key: string]: any;
+    [key: string | number]: any;
+};
+
+export interface MutableHeaders extends MutableMixedObject {
+    [key: string | number]: any;
 }
 
 export interface ApiError {

@@ -4,6 +4,7 @@ import { defineStore } from 'pinia';
 
 import authService from '@/services/auth.service';
 import type { LoginCredentials, RegisterData, User } from '@/types/auth.types';
+import { getTokenFromResponse, ifObjectOr } from '@/utils/data-helpers';
 
 export const useAuthStore = defineStore('auth', () => {
     // State
@@ -23,18 +24,25 @@ export const useAuthStore = defineStore('auth', () => {
             loading.value = true;
             error.value = null;
 
-            const response = await authService.login(credentials);
-            accessToken.value = response?.token;
-            refreshToken.value = response?.refresh_token;
+            const response = ifObjectOr(await authService.login(credentials), {});
+            console.log('login response', response);
+            accessToken.value = getTokenFromResponse(response, 'token');
+            refreshToken.value = getTokenFromResponse(response, 'refresh_token');
 
-            localStorage.setItem('access_token', response?.token || null);
-            localStorage.setItem('refresh_token', response?.refresh_token || null);
+            if (accessToken.value) {
+                localStorage.setItem('access_token', accessToken.value);
+            }
+
+            if (refreshToken.value) {
+                localStorage.setItem('refresh_token', refreshToken.value);
+            }
 
             const userData = await authService.me();
             user.value = userData;
 
             return response;
         } catch (err: any) {
+            console.log('err', err);
             error.value = err.message || 'Login failed';
             throw err;
         } finally {
@@ -47,13 +55,18 @@ export const useAuthStore = defineStore('auth', () => {
             loading.value = true;
             error.value = null;
 
-            const response = await authService.register(data);
+            const response = ifObjectOr(await authService.register(data), {});
 
-            accessToken.value = response?.token;
-            refreshToken.value = response?.refresh_token;
+            accessToken.value = getTokenFromResponse(response, 'token');
+            refreshToken.value = getTokenFromResponse(response, 'refresh_token');
 
-            localStorage.setItem('access_token', response?.token);
-            localStorage.setItem('refresh_token', response?.refresh_token);
+            if (accessToken.value) {
+                localStorage.setItem('access_token', accessToken.value);
+            }
+
+            if (refreshToken.value) {
+                localStorage.setItem('refresh_token', refreshToken.value);
+            }
 
             const userData = await authService.me();
             user.value = userData;
@@ -107,13 +120,18 @@ export const useAuthStore = defineStore('auth', () => {
         }
 
         try {
-            const response = await authService.refreshToken(refreshToken.value);
+            const response = ifObjectOr(await authService.refreshToken(refreshToken.value));
 
-            accessToken.value = response?.token;
-            refreshToken.value = response?.refresh_token;
+            accessToken.value = getTokenFromResponse(response, 'token');
+            refreshToken.value = getTokenFromResponse(response, 'refresh_token');
 
-            localStorage.setItem('access_token', response?.token);
-            localStorage.setItem('refresh_token', response?.refresh_token);
+            if (accessToken.value) {
+                localStorage.setItem('access_token', accessToken.value);
+            }
+
+            if (refreshToken.value) {
+                localStorage.setItem('refresh_token', refreshToken.value);
+            }
 
             const userData = await authService.me();
             user.value = userData;

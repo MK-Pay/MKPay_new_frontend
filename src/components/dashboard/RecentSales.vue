@@ -4,7 +4,7 @@
             <ul class="-my-5 divide-y divide-gray-200">
                 <li v-for="sale in sales" :key="sale.id" class="py-4">
                     <div class="flex items-center space-x-4">
-                        <div class="flex-shrink-0">
+                        <div class="shrink-0">
                             <div class="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
                                 <svg
                                     class="h-5 w-5 text-blue-600"
@@ -57,13 +57,13 @@
 
 <script setup lang="ts">
 import Card from '@/components/shared/Card.vue';
-import StatusBadge from '@/components/shared/StatusBadge.vue';
 import EmptyState from '@/components/shared/EmptyState.vue';
-import { formatCurrency, formatRelativeTime } from '@/utils/formatters';
+import StatusBadge from '@/components/shared/StatusBadge.vue';
 import type { RecentSale } from '@/types/dashboard.types';
+import { formatCurrency, formatRelativeTime } from '@/utils/formatters';
 
 interface Props {
-    sales?: RecentSale[];
+    sales?: RecentSale[] | null;
 }
 
 defineProps<Props>();

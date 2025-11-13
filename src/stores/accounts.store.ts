@@ -1,5 +1,7 @@
+import { computed, ref } from 'vue';
+
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+
 import accountsService from '@/services/accounts.service';
 import type { Account } from '@/types/auth.types';
 
@@ -20,10 +22,10 @@ export const useAccountsStore = defineStore('accounts', () => {
             loading.value = true;
             error.value = null;
 
-            accounts.value = await accountsService.getAccounts();
+            accounts.value = (await accountsService.getAccounts()) || [];
 
             // Auto-select first account if none selected
-            if (!selectedAccount.value && accounts.value.length > 0) {
+            if (!selectedAccount.value && accounts.value?.length > 0) {
                 selectAccount(accounts.value[0]!);
             }
         } catch (err: any) {
@@ -37,6 +39,7 @@ export const useAccountsStore = defineStore('accounts', () => {
     function selectAccount(account: Account) {
         selectedAccount.value = account;
         localStorage.setItem('selected_account_uuid', account.uuid);
+        localStorage.setItem('selected_account_id', account.id);
     }
 
     function clearSelectedAccount() {

@@ -1,5 +1,5 @@
 <template>
-    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+    <div v-if="stats" class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <!-- Total Apps -->
         <Card padding="sm">
             <div class="flex items-center justify-between">
@@ -103,11 +103,11 @@
 
 <script setup lang="ts">
 import Card from '@/components/shared/Card.vue';
-import { formatCurrency, formatNumber, formatPercentage } from '@/utils/formatters';
 import type { DashboardStats } from '@/types/dashboard.types';
+import { formatCurrency, formatNumber, formatPercentage } from '@/utils/formatters';
 
 interface Props {
-    stats?: DashboardStats;
+    stats?: DashboardStats | null;
 }
 
 defineProps<Props>();

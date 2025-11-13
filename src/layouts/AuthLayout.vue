@@ -1,40 +1,27 @@
 <template>
     <div>
         <!-- Account Selector (only for authenticated pages) -->
-        <AccountSelector v-if="isAuthenticatedPage" />
+        <AccountSelector />
 
         <!-- Main Content -->
-        <div v-if="!isAuthenticatedPage || accountsStore.currentAccount">
+        <div v-if="accountsStore.currentAccountUuid">
             <slot />
-        </div>
-
-        <!-- Empty State - No Account Selected -->
-        <div v-else class="min-h-screen bg-gray-100 flex items-center justify-center">
-            <div class="text-center">
-                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                    />
-                </svg>
-                <h3 class="mt-2 text-lg font-medium text-gray-900">Nenhuma conta selecionada</h3>
-                <p class="mt-1 text-sm text-gray-500">Selecione uma conta no menu acima para começar</p>
-            </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
+
 import { useRouter } from 'vue-router';
-import { useAccountsStore } from '@/stores/accounts.store';
+
 import AccountSelector from '@/components/shared/AccountSelector.vue';
+import { useAccountsStore } from '@/stores/accounts.store';
 
 const router = useRouter();
 const accountsStore = useAccountsStore();
-const isAuthenticatedPage = ref(false);
+const selectedUuid = ref<string>(accountsStore.currentAccountUuid || '');
+const isAuthenticatedPage = ref(Boolean(selectedUuid.value));
 
 const AUTHENTICATED_ROUTES = [
     'dashboard',

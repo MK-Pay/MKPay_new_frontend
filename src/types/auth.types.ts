@@ -41,6 +41,10 @@ export interface RegisterData {
 
 export interface AuthResponse {
     token: string; // API retorna apenas o token
+    refresh_token?: string | null;
+    data?: any;
+    // [key: string|number]: any;
+    [key: string]: any;
 }
 
 export interface ForgotPasswordData {
