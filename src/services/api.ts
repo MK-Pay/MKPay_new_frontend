@@ -105,7 +105,7 @@ class ApiClient {
                     localStorage.removeItem('access_token');
                     localStorage.removeItem('refresh_token');
                     console.log('Redirect to /login');
-                    // window.location.href = '/login';
+                    window.location.href = '/login';
                 }
             }
 
@@ -113,7 +113,7 @@ class ApiClient {
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
             console.log('Redirect to /login');
-            // window.location.href = '/login';
+            window.location.href = '/login';
         }
 
         // Handle other errors

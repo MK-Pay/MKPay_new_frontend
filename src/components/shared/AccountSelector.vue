@@ -55,6 +55,7 @@
             <h3 class="mt-2 text-lg font-medium text-gray-900">Nenhuma conta selecionada</h3>
             <p class="mt-1 text-sm text-gray-500">Selecione uma conta no menu acima para começar</p>
         </div>
+        <!-- Removed unused SecondaryButton component -->
     </div>
 </template>
 

@@ -39,7 +39,12 @@ export const useAccountsStore = defineStore('accounts', () => {
     function selectAccount(account: Account) {
         selectedAccount.value = account;
         localStorage.setItem('selected_account_uuid', account.uuid);
-        localStorage.setItem('selected_account_id', account.id);
+        localStorage.setItem('selected_account_id', String(account.id));
+
+        if (!['/dashboard'].includes(window.location.pathname)) {
+            console.log('Redirect to /dashboard');
+            window.location.href = '/dashboard';
+        }
     }
 
     function clearSelectedAccount() {
