@@ -18,9 +18,13 @@ import { useRouter } from 'vue-router';
 
 import MainLayout from '@/components/layout/MainLayout.vue';
 import { useAccountsStore } from '@/stores/accounts.store';
+import { usePermissionsStore } from '@/stores/permissions.store';
+import { useAuthStore } from '@/stores/auth.store';
 
 const router = useRouter();
 const accountsStore = useAccountsStore();
+const permissionsStore = usePermissionsStore();
+const authStore = useAuthStore();
 
 const AUTHENTICATED_ROUTES = [
     'dashboard',
@@ -40,31 +44,39 @@ const isAuthenticatedPage = computed(() => {
     return AUTHENTICATED_ROUTES.includes(currentRouteName);
 });
 
-// Função para carregar contas
-async function loadAccounts() {
-    if (isAuthenticatedPage.value) {
-        if (accountsStore.accounts.length === 0) {
-            try {
-                await accountsStore.fetchAccounts();
-            } catch (error) {
-                console.error('Failed to load accounts:', error);
-            }
-        } else {
-            accountsStore.restoreSelectedAccount();
-        }
+// Função para carregar dados do usuário (contas e permissões)
+async function loadUserData() {
+    // Só carregar se estiver em página autenticada e tiver token
+    if (!isAuthenticatedPage.value || !authStore.isAuthenticated) {
+        return;
+    }
+
+    try {
+        // Carregar accounts e permissions em paralelo
+        await Promise.all([
+            // Carregar accounts
+            accountsStore.accounts.length === 0
+                ? accountsStore.fetchAccounts()
+                : Promise.resolve(accountsStore.restoreSelectedAccount()),
+
+            // Sempre sincronizar permissions ao dar refresh
+            permissionsStore.fetchPermissions(),
+        ]);
+    } catch (error) {
+        console.error('Failed to load user data:', error);
     }
 }
 
-// Carregar contas ao montar
+// Carregar dados do usuário ao montar
 onMounted(() => {
-    loadAccounts();
+    loadUserData();
 });
 
-// Carregar contas ao mudar de rota
+// Carregar dados ao mudar de rota
 watch(
     () => router.currentRoute.value.name,
     () => {
-        loadAccounts();
+        loadUserData();
     }
 );
 </script>

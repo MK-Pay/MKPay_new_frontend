@@ -111,13 +111,19 @@ onMounted(() => {
 The permissions system fetches data from the backend API:
 1. **Endpoint**: `POST /api/v1/auth/user?info=permissions,roles,accounts`
 2. **Returns**: `{ permissions: string[], roles: string[], accounts: Account[] }`
-3. **When**: Called automatically after successful login/register in `authStore.login()` and `authStore.register()`
+3. **When**: Called automatically in these scenarios:
+   - After successful login/register in `authStore.login()` and `authStore.register()`
+   - **On application boot/page refresh** in `AuthLayout.vue` (if authenticated)
+   - Manually via sync button in `/perfil` page
 4. **Fallback**: If API fails, loads mocked permissions for development
 
 The permissions are automatically:
 - Fetched after login/register
+- **Synced on every page refresh/reload** (ensures fresh permissions)
 - Cleared on logout
 - Used throughout the app to control UI visibility and API calls
+
+**Note**: Every time you refresh the page, permissions are automatically re-synced from the server to ensure you always have the latest access rights.
 
 ### API Integration Pattern
 
