@@ -1,12 +1,5 @@
-import type {
-    ApiError,
-    ApiResponse,
-    MutableHeaders,
-} from '@/types/api.types';
-import {
-    getEnvName,
-    isDev,
-} from '@/utils/data-helpers';
+import type { ApiError, ApiResponse, MutableHeaders } from '@/types/api.types';
+import { getEnvName, isDev } from '@/utils/data-helpers';
 
 interface RequestConfig extends RequestInit {
     params?: Record<string, any>;

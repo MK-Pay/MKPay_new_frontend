@@ -46,10 +46,7 @@ export const useAuthStore = defineStore('auth', () => {
             const permissionsStore = usePermissionsStore();
             const accountsStore = useAccountsStore();
 
-            await Promise.all([
-                permissionsStore.fetchPermissions(),
-                accountsStore.fetchAccounts(),
-            ]);
+            await Promise.all([permissionsStore.fetchPermissions(), accountsStore.fetchAccounts()]);
 
             return response;
         } catch (err: any) {
@@ -86,10 +83,7 @@ export const useAuthStore = defineStore('auth', () => {
             const permissionsStore = usePermissionsStore();
             const accountsStore = useAccountsStore();
 
-            await Promise.all([
-                permissionsStore.fetchPermissions(),
-                accountsStore.fetchAccounts(),
-            ]);
+            await Promise.all([permissionsStore.fetchPermissions(), accountsStore.fetchAccounts()]);
 
             return response;
         } catch (err: any) {

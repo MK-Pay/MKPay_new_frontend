@@ -54,7 +54,7 @@
         />
 
         <!-- Apps Grid -->
-        <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div v-else class="flex flex-col gap-6">
             <AppCard v-for="app in filteredApps" :key="app.id" :app="app" @delete="handleDeleteRequest" />
         </div>
 
@@ -76,15 +76,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import AppCard from './AppCard.vue';
-import AppCreateModal from './AppCreateModal.vue';
-import LoadingSpinner from '@/components/shared/LoadingSpinner.vue';
-import EmptyState from '@/components/shared/EmptyState.vue';
+import { computed, ref } from 'vue';
+
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue';
+import EmptyState from '@/components/shared/EmptyState.vue';
+import LoadingSpinner from '@/components/shared/LoadingSpinner.vue';
 import { useApps } from '@/composables/useApps';
 import { usePermissions } from '@/composables/usePermissions';
 import type { App } from '@/types/app.types';
+
+import AppCard from './AppCard.vue';
+import AppCreateModal from './AppCreateModal.vue';
 
 const { apps, loading, deleteApp } = useApps();
 const { hasPermission } = usePermissions();

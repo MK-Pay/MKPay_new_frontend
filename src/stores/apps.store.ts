@@ -1,5 +1,7 @@
-import { defineStore } from 'pinia';
 import { ref } from 'vue';
+
+import { defineStore } from 'pinia';
+
 import appsService from '@/services/apps.service';
 import type { App, AppStats, CreateAppDTO, UpdateAppDTO } from '@/types/app.types';
 
@@ -17,7 +19,7 @@ export const useAppsStore = defineStore('apps', () => {
             loading.value = true;
             error.value = null;
 
-            apps.value = await appsService.getApps();
+            apps.value = (await appsService.getApps()) as App[];
         } catch (err: any) {
             error.value = err.message || 'Failed to fetch apps';
             throw err;
@@ -47,7 +49,7 @@ export const useAppsStore = defineStore('apps', () => {
             error.value = null;
 
             const newApp = await appsService.createApp(data);
-            apps.value.unshift(newApp);
+            (apps.value || []).unshift(newApp);
             return newApp;
         } catch (err: any) {
             error.value = err.message || 'Failed to create app';

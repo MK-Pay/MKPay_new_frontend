@@ -1,6 +1,6 @@
 import type { ApiResponse, PaginatedResponse } from '@/types/api.types';
 import type { App, AppStats, CreateAppDTO, UpdateAppDTO } from '@/types/app.types';
-import { ifObjectOr } from '@/utils/data-helpers';
+import { ifArrayOr, ifObjectOr } from '@/utils/data-helpers';
 
 import api from './api';
 
@@ -25,24 +25,24 @@ class AppsService {
         }
     }
 
-    async getApps(): Promise<App[] | any[] | null> {
+    async getApps(): Promise<any[] | any[] | null> {
         const accountUuid = this.getAccountUuid();
 
         if (!accountUuid) {
             return null;
         }
 
-        const response = await api.get<ApiResponse<PaginatedResponse<App>>>('/api/v1/apps', {
+        const response = await api.get<ApiResponse<PaginatedResponse<any>>>('/api/v1/apps', {
             params: { account_uuid: accountUuid },
         });
 
         if ('data' in response) {
             return 'data' in ifObjectOr(response.data)
-                ? ifObjectOr(ifObjectOr(response.data)?.data)
-                : ifObjectOr(response.data);
+                ? ifArrayOr(ifObjectOr(response.data)?.data)
+                : ifArrayOr(response.data);
         }
 
-        return ifObjectOr(response);
+        return ifArrayOr(response);
     }
 
     async getApp(appId: string): Promise<App> {

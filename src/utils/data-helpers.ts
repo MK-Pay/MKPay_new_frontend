@@ -36,6 +36,10 @@ export const isArrayOr = (value: unknown, defaultValue: any[] = []): any => {
     return isArray(value) ? value : defaultValue;
 };
 
+export const ifArrayOr = (value: unknown, defaultValue: any[] = []): any => {
+    return isArray(value) ? value : defaultValue;
+};
+
 export const getTokenFromResponse = function (
     response: ApiResponse<AuthResponse> | AuthResponse | MutableMixedObject | null | any,
     key: string = 'token'
