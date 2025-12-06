@@ -1,5 +1,12 @@
-import type { ApiError, ApiResponse, MutableHeaders } from '@/types/api.types';
-import { getEnvName, isDev } from '@/utils/data-helpers';
+import type {
+    ApiError,
+    ApiResponse,
+    MutableHeaders,
+} from '@/types/api.types';
+import {
+    getEnvName,
+    isDev,
+} from '@/utils/data-helpers';
 
 interface RequestConfig extends RequestInit {
     params?: Record<string, any>;
@@ -40,7 +47,7 @@ class ApiClient {
                 }
 
                 if (selectedAccountId) {
-                    headers['X-Account-Id'] = selectedAccountId;
+                    // headers['X-Account-Id'] = selectedAccountId;
                 }
             } catch (error) {
                 // Se não conseguir obter account UUID, continua sem header
