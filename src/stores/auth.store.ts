@@ -5,6 +5,8 @@ import { defineStore } from 'pinia';
 import authService from '@/services/auth.service';
 import type { LoginCredentials, RegisterData, User } from '@/types/auth.types';
 import { getTokenFromResponse, ifObjectOr } from '@/utils/data-helpers';
+import { usePermissionsStore } from './permissions.store';
+import { useAccountsStore } from './accounts.store';
 
 export const useAuthStore = defineStore('auth', () => {
     // State
@@ -40,6 +42,15 @@ export const useAuthStore = defineStore('auth', () => {
             const userData = await authService.me();
             user.value = userData;
 
+            // Carregar permissões e contas após login bem-sucedido
+            const permissionsStore = usePermissionsStore();
+            const accountsStore = useAccountsStore();
+
+            await Promise.all([
+                permissionsStore.fetchPermissions(),
+                accountsStore.fetchAccounts(),
+            ]);
+
             return response;
         } catch (err: any) {
             console.log('err', err);
@@ -71,6 +82,15 @@ export const useAuthStore = defineStore('auth', () => {
             const userData = await authService.me();
             user.value = userData;
 
+            // Carregar permissões e contas após registro bem-sucedido
+            const permissionsStore = usePermissionsStore();
+            const accountsStore = useAccountsStore();
+
+            await Promise.all([
+                permissionsStore.fetchPermissions(),
+                accountsStore.fetchAccounts(),
+            ]);
+
             return response;
         } catch (err: any) {
             error.value = err.message || 'Registration failed';
@@ -92,6 +112,13 @@ export const useAuthStore = defineStore('auth', () => {
             refreshToken.value = null;
             localStorage.removeItem('access_token');
             localStorage.removeItem('refresh_token');
+
+            // Limpar permissões e contas ao deslogar
+            const permissionsStore = usePermissionsStore();
+            const accountsStore = useAccountsStore();
+            permissionsStore.clearPermissions();
+            accountsStore.clearSelectedAccount();
+
             loading.value = false;
         }
     }

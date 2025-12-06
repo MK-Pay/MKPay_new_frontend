@@ -11,6 +11,7 @@
                 />
             </div>
             <button
+                v-if="hasPermission('apps.create')"
                 @click="showCreateModal = true"
                 class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
@@ -32,7 +33,7 @@
             title="Nenhuma aplicação cadastrada"
             description="Comece criando sua primeira aplicação para gerenciar tokens e vendas"
         >
-            <template #action>
+            <template v-if="hasPermission('apps.create')" #action>
                 <button
                     @click="showCreateModal = true"
                     class="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -82,9 +83,11 @@ import LoadingSpinner from '@/components/shared/LoadingSpinner.vue';
 import EmptyState from '@/components/shared/EmptyState.vue';
 import ConfirmDialog from '@/components/shared/ConfirmDialog.vue';
 import { useApps } from '@/composables/useApps';
+import { usePermissions } from '@/composables/usePermissions';
 import type { App } from '@/types/app.types';
 
 const { apps, loading, deleteApp } = useApps();
+const { hasPermission } = usePermissions();
 
 const searchQuery = ref('');
 const showCreateModal = ref(false);

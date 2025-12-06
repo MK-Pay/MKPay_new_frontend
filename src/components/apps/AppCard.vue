@@ -51,7 +51,11 @@
             <span class="text-gray-500">
                 {{ app.last_used_at ? `Último uso: ${formatRelativeTime(app.last_used_at)}` : 'Nunca usado' }}
             </span>
-            <button @click.stop="$emit('delete', app.id)" class="text-red-600 hover:text-red-700 font-medium">
+            <button
+                v-if="hasPermission('apps.delete')"
+                @click.stop="$emit('delete', app.id)"
+                class="text-red-600 hover:text-red-700 font-medium"
+            >
                 Deletar
             </button>
         </div>
@@ -64,6 +68,7 @@ import { useRouter } from 'vue-router';
 import Card from '@/components/shared/Card.vue';
 import StatusBadge from '@/components/shared/StatusBadge.vue';
 import { formatRelativeTime } from '@/utils/formatters';
+import { usePermissions } from '@/composables/usePermissions';
 import type { App } from '@/types/app.types';
 
 interface Props {
@@ -77,6 +82,7 @@ defineEmits<{
 }>();
 
 const router = useRouter();
+const { hasPermission } = usePermissions();
 
 const appInitials = computed(() => {
     return props.app.name

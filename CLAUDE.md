@@ -57,6 +57,68 @@ The application implements a global account selection system that ensures no res
 5. Changing selection updates `accountsStore.selectedAccount`
 6. All API calls receive `account_uuid` parameter automatically
 
+### Permissions System
+
+The application implements a role-based permissions system to control access to features and actions.
+
+#### Key Components & Files
+
+1. **Permissions Store** (`src/stores/permissions.store.ts`)
+   - Pinia store managing permissions and roles globally
+   - Currently uses mocked permissions (will be replaced with API endpoint)
+   - Provides helper methods: `hasPermission()`, `hasAnyPermission()`, `hasAllPermissions()`, `hasRole()`
+
+2. **Permissions Composable** (`src/composables/usePermissions.ts`)
+   - Wrapper for permissions store with convenience methods
+   - Used in components to check permissions before rendering UI
+
+#### Available Permissions (Mocked)
+
+Current mocked permissions for development:
+- `apps.view` - View applications list
+- `apps.create` - Create new applications
+- `apps.update` - Update existing applications
+- `apps.delete` - Delete applications
+- `dashboard.view` - Access dashboard
+- `profile.view` - View profile
+- `profile.update` - Update profile
+
+#### Usage Pattern
+
+```typescript
+// In component script
+import { usePermissions } from '@/composables/usePermissions';
+
+const { hasPermission } = usePermissions();
+
+// Check permission before fetching data
+onMounted(() => {
+    if (hasPermission('apps.view')) {
+        fetchApps();
+    }
+});
+```
+
+```vue
+<!-- In template -->
+<button v-if="hasPermission('apps.create')" @click="createApp">
+    Nova Aplicação
+</button>
+```
+
+#### API Integration
+
+The permissions system fetches data from the backend API:
+1. **Endpoint**: `POST /api/v1/auth/user?info=permissions,roles,accounts`
+2. **Returns**: `{ permissions: string[], roles: string[], accounts: Account[] }`
+3. **When**: Called automatically after successful login/register in `authStore.login()` and `authStore.register()`
+4. **Fallback**: If API fails, loads mocked permissions for development
+
+The permissions are automatically:
+- Fetched after login/register
+- Cleared on logout
+- Used throughout the app to control UI visibility and API calls
+
 ### API Integration Pattern
 
 Services use the global account context to pass `account_uuid` to API endpoints:
